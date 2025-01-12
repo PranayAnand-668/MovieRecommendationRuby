@@ -15,6 +15,16 @@ class TmdbService
     JSON.parse(response)['results']
   end
 
+  def fetch_trailer(movie_id)
+    url = URI("#{BASE_URL}/movie/#{movie_id}/videos?api_key=#{@api_key}")
+    response = Net::HTTP.get(url)
+    videos = JSON.parse(response)['results']
+
+    # Filter for a YouTube trailer
+    trailer = videos.find { |video| video['site'] == 'YouTube' && video['type'] == 'Trailer' }
+    trailer ? "https://www.youtube.com/watch?v=#{trailer['key']}" : nil
+  end
+
   def fetch_movie_details(title)
     url = URI("#{BASE_URL}/search/movie?query=#{title}&api_key=#{@api_key}")
     request = Net::HTTP::Get.new(url)

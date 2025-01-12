@@ -1,7 +1,12 @@
 class MoviesController < ApplicationController
   def index
     tmdb_service = TmdbService.new
-    @movies = tmdb_service.fetch_movies
+    movies = tmdb_service.fetch_movies
+
+    @movies = movies.map do |movie|
+      trailer_url = tmdb_service.fetch_trailer(movie['id']) 
+      movie.merge('trailer_url' => trailer_url)            
+    end
     # Rails.logger.info "Fetched Movies: #{@movies.inspect}"
     favorite_movies = FavoriteMovie.pluck(:title)
 
@@ -36,11 +41,15 @@ class MoviesController < ApplicationController
 
   def store_movie
     movie_title = params[:title]
-  
+    trailer_url = params[:trailer_url]
+
     if movie_title.present?
       # Save the movie to the database
       favorite_movie = FavoriteMovie.find_or_create_by(title: movie_title)
       if favorite_movie.persisted?
+        if trailer_url.present?
+          redirect_to trailer_url, allow_other_host: true and return
+        end
         flash[:notice] = "Movie '#{movie_title}' saved successfully!"
       else
         flash[:alert] = "Failed to save movie."
