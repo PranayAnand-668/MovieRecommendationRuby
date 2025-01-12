@@ -1,0 +1,22 @@
+<h1>Recommended Movies</h1>
+
+<% if @movies_details.present? %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+<% @movies_details.each do |movie| %>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden" data-title="<%= movie['title'] %>">
+      <% if movie["poster_path"].present? %>
+        <img src="https://image.tmdb.org/t/p/w500<%= movie['poster_path'] %>" alt="<%= movie['title'] %>" class="w-full h-64 object-cover">
+      <% else %>
+        <img src="https://image.tmdb.org/t/p/w500<%= movie['backdrop_path'] %>" alt="Default Image" class="w-full h-64 object-cover">
+      <% end %>
+      <div class="p-4">
+        <h2 class="text-lg font-semibold"><%= movie['title'] %></h2>
+        <p class="text-gray-600 text-sm">Release Date: <%= movie['release_date'] %></p>
+        <p class="text-gray-800 text-sm mt-2"><%= truncate(movie['overview'], length: 100) %></p>
+      </div>
+    </div>
+  <% end %>
+</div>
+<% else %>
+  <p>No movies found.</p>
+<% end %>

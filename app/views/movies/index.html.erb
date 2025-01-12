@@ -1,0 +1,82 @@
+<% if flash[:notice] %>
+  <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
+    <%= flash[:notice] %>
+  </div>
+<% elsif flash[:alert] %>
+  <div class="bg-red-500 text-white p-4 rounded-lg mb-4">
+    <%= flash[:alert] %>
+  </div>
+<% end %>
+
+<div class="flex flex-col">
+<h1 class="text-3xl font-bold mb-4">Popular Movies</h1>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+<% @movies.each do |movie| %>
+  <%= form_with url: store_movie_movies_path, method: :post, class: "bg-white shadow-md rounded-lg overflow-hidden", local: true do |form| %>
+        <%= form.hidden_field :title, value: movie['title'] %>
+        <button type="submit" class="w-full">
+          <img src="https://image.tmdb.org/t/p/w500<%= movie['poster_path'] %>" alt="<%= movie['title'] %>" class="w-full h-64 object-cover">
+          <div class="p-4">
+            <h2 class="text-lg font-semibold"><%= movie['title'] %></h2>
+            <p class="text-gray-600 text-sm">Release Date: <%= movie['release_date'] %></p>
+            <p class="text-gray-800 text-sm mt-2"><%= truncate(movie['overview'], length: 100) %></p>
+          </div>
+        </button>
+      <% end %>
+    <% end %>
+</div>
+<br/>
+<%= button_to "Clear Favorite Movies", truncate_favorites_movies_path, method: :post, data: { confirm: "Are you sure you want to delete all favorite movies?" }, class: "bg-red-200 hover:bg-red-700 text-Black font-bold py-2 px-4 rounded" %>
+
+<br/>
+<div id="recommendations">
+<h1 class="text-3xl font-bold mb-4">Recommended for You</h1>
+  <% if @recommendations.present? %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <% @recommendations.each do |movie| %>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <% if movie["poster_path"].present? %>
+        <img src="https://image.tmdb.org/t/p/w500<%= movie['poster_path'] %>" alt="<%= movie['title'] %>" class="w-full h-64 object-cover">
+      <% else %>
+        <img src="https://image.tmdb.org/t/p/w500<%= movie['backdrop_path'] %>" alt="Default Image" class="w-full h-64 object-cover">
+      <% end %>
+      <div class="p-4">
+        <h2 class="text-lg font-semibold"><%= movie['title'] %></h2>
+        <p class="text-gray-600 text-sm">Release Date: <%= movie['release_date'] %></p>
+        <p class="text-gray-800 text-sm mt-2"><%= truncate(movie['overview'], length: 100) %></p>
+      </div>
+    </div>
+  <% end %>
+</div>
+<% else %>
+  <p>No recommendations available yet.</p>
+<% end %>
+</div>
+
+<!-- movies/index.html.erb -->
+<br/>
+<div class="border rounded-lg p-4 flex flex-col justify-center">
+<h1 class="mx-auto ">Movie Recommendations</h1>
+<%= form_with url: fetch_recommendations_movies_path, method: :post, id: "movie-recommendation-form",class:"mx-auto, border-2", local: true do |form| %>
+  <div class="mb-4 flex flex-col border border-2">
+    <%= form.label :genre, "Favorite Genre", class: "block text-lg font-semibold" %>
+    <%= form.text_field :genre, class: "input mt-2 border border-2" %>
+  </div>
+
+  <div class="mb-4 flex flex-col border border-2">
+    <%= form.label :actor, "Favorite Actor", class: "block text-lg font-semibold" %>
+    <%= form.text_field :actor, class: "input mt-2" %>
+  </div>
+
+  <div class="mb-4 flex flex-col border border-2">
+    <%= form.label :mood, "What mood are you in?", class: "block text-lg font-semibold" %>
+    <%= form.text_field :mood, class: "input mt-2" %>
+  </div>
+
+  <div>
+    <%= form.submit "Get Recommendations", class: "button rounded-lg bg-blue-500 text-white p-4 w-[50%] mx-auto" %>
+  </div>
+<% end %>
+
+
+</div>
